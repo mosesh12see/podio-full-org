@@ -10,6 +10,9 @@ on:
       - 'full_org_return.py'
       - '.github/workflows/auto-update.yml'
 
+permissions:
+  contents: write
+
 jobs:
   update-dashboard:
     runs-on: ubuntu-latest
