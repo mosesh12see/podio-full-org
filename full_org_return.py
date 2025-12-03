@@ -1147,7 +1147,7 @@ def generate_html(ytd_stats, since_start_stats, mtd_stats, wtd_stats, monthly_st
 </html>
 """
 
-    output_path = "/Users/mosesherrera/Desktop/Podio Api Full Org/full_org_return.html"
+    output_path = "full_org_return.html"
     with open(output_path, "w") as f:
         f.write(html)
 
