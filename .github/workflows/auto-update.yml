@@ -35,8 +35,6 @@ jobs:
         env:
           PODIO_CLIENT_ID: ${{ secrets.PODIO_CLIENT_ID }}
           PODIO_CLIENT_SECRET: ${{ secrets.PODIO_CLIENT_SECRET }}
-          PODIO_USERNAME: ${{ secrets.PODIO_USERNAME }}
-          PODIO_PASSWORD: ${{ secrets.PODIO_PASSWORD }}
         run: |
           python full_org_return.py
           echo "Dashboard generated at $(date)"
