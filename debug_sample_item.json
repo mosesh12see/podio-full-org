@@ -1,0 +1,620 @@
+{
+  "app_item_id": 770,
+  "app_item_id_formatted": "770",
+  "comment_count": 0,
+  "created_by": {
+    "avatar": -1,
+    "avatar_id": 24,
+    "avatar_type": "icon",
+    "image": null,
+    "last_seen_on": null,
+    "name": "Full Org ",
+    "id": 30430059,
+    "type": "app",
+    "url": "https://podio.com/eg-solar/full-org/apps/full-org",
+    "user_id": -1
+  },
+  "created_on": "2025-10-24 21:17:04",
+  "created_via": {
+    "auth_client_id": 9108,
+    "display": true,
+    "id": 9108,
+    "name": "Workflow automation",
+    "url": null
+  },
+  "external_id": null,
+  "fields": [
+    {
+      "config": {
+        "label": "Customer",
+        "mapping": null,
+        "settings": {
+          "multiple": true,
+          "referenceable_types": [
+            29175634
+          ],
+          "referenced_apps": [
+            {
+              "app_id": 29175634,
+              "view_id": null
+            }
+          ]
+        }
+      },
+      "external_id": "customer",
+      "field_id": 273434450,
+      "label": "Customer",
+      "type": "app",
+      "values": [
+        {
+          "value": {
+            "app": {
+              "app_id": 29175634,
+              "config": {
+                "icon": "55.png",
+                "icon_id": 55,
+                "item_name": "Customer",
+                "name": "Closer App",
+                "type": "standard"
+              },
+              "current_revision": 428,
+              "default_view_id": null,
+              "icon": "55.png",
+              "icon_id": 55,
+              "is_default": false,
+              "item_accounting_info": null,
+              "item_name": "Customer",
+              "link": "https://podio.com/eg-solar/eg-solar/apps/closer-app",
+              "link_add": "https://podio.com/eg-solar/eg-solar/apps/closer-app/items/new",
+              "name": "Closer App",
+              "sharefile_vault_url": null,
+              "space_id": 8829787,
+              "status": "active",
+              "url_add": "https://podio.com/eg-solar/eg-solar/apps/closer-app/items/new",
+              "url": "https://podio.com/eg-solar/eg-solar/apps/closer-app",
+              "url_label": "closer-app"
+            },
+            "app_item_id": 7764,
+            "created_by": {
+              "avatar": -1,
+              "avatar_id": 55,
+              "avatar_type": "icon",
+              "image": null,
+              "last_seen_on": null,
+              "name": "Closer App",
+              "id": 29175634,
+              "type": "app",
+              "url": "https://podio.com/eg-solar/eg-solar/apps/closer-app",
+              "user_id": -1
+            },
+            "created_on": "2025-10-24 21:16:19",
+            "created_via": {
+              "auth_client_id": 9108,
+              "display": true,
+              "id": 9108,
+              "name": "Workflow automation",
+              "url": null
+            },
+            "files": [],
+            "item_id": 3188439897,
+            "link": "https://podio.com/eg-solar/eg-solar/apps/closer-app/items/7764",
+            "revision": 9,
+            "initial_revision": {
+              "created_by": {
+                "avatar": -1,
+                "avatar_id": 55,
+                "avatar_type": "icon",
+                "image": null,
+                "last_seen_on": null,
+                "name": "Closer App",
+                "id": 29175634,
+                "type": "app",
+                "url": "https://podio.com/eg-solar/eg-solar/apps/closer-app",
+                "user_id": -1
+              },
+              "created_on": "2025-10-24 21:16:19",
+              "created_via": {
+                "auth_client_id": 9108,
+                "display": true,
+                "id": 9108,
+                "name": "Workflow automation",
+                "url": null
+              },
+              "item_revision_id": 14755929435,
+              "revision": 0,
+              "type": "creation",
+              "user": {
+                "avatar": -1,
+                "avatar_id": 55,
+                "avatar_type": "icon",
+                "image": null,
+                "last_seen_on": null,
+                "name": "Closer App",
+                "id": 29175634,
+                "type": "app",
+                "url": "https://podio.com/eg-solar/eg-solar/apps/closer-app",
+                "user_id": -1
+              }
+            },
+            "sharefile_vault_folder_id": null,
+            "sharefile_vault_url": null,
+            "space": null,
+            "title": "John Jennemann"
+          }
+        }
+      ]
+    },
+    {
+      "config": {
+        "label": "Drive Time from Hub",
+        "mapping": null,
+        "settings": {
+          "size": "large",
+          "format": "html"
+        }
+      },
+      "external_id": "drive-time-from-hub-2",
+      "field_id": 273434451,
+      "label": "Drive Time from Hub",
+      "type": "text",
+      "values": [
+        {
+          "value": "<p>Stl Mo - 43m</p>"
+        }
+      ]
+    },
+    {
+      "config": {
+        "label": "Appointment Date",
+        "mapping": null,
+        "settings": {
+          "calendar": true,
+          "end": "disabled",
+          "time": "disabled",
+          "color": "DCEBD8"
+        }
+      },
+      "external_id": "appointment-date",
+      "field_id": 273434452,
+      "label": "Appointment Date",
+      "type": "date",
+      "values": [
+        {
+          "start": "2025-10-25 00:00:00",
+          "start_date": "2025-10-25",
+          "start_time": null,
+          "start_utc": "2025-10-25",
+          "start_date_utc": "2025-10-25",
+          "start_time_utc": null
+        }
+      ]
+    },
+    {
+      "config": {
+        "label": "Appointment Time (Local Time)",
+        "mapping": null,
+        "settings": {
+          "size": "small",
+          "format": "plain"
+        }
+      },
+      "external_id": "appointment-time-local-time",
+      "field_id": 273434453,
+      "label": "Appointment Time (Local Time)",
+      "type": "text",
+      "values": [
+        {
+          "value": "11:00AM"
+        }
+      ]
+    },
+    {
+      "config": {
+        "label": "Partner Assigned.",
+        "mapping": null,
+        "settings": {
+          "unit": null,
+          "decimals": null,
+          "time": null,
+          "calendar": null,
+          "color": null,
+          "expression": null,
+          "script": "@[All of Partner Assigned](out_258441247_273434450)+ \" \"",
+          "return_type": "text"
+        }
+      },
+      "external_id": "partner-assigned",
+      "field_id": 273434455,
+      "label": "Partner Assigned.",
+      "type": "calculation",
+      "values": [
+        {
+          "value": "Wyatt Stettler,Robert Soderholm "
+        }
+      ]
+    },
+    {
+      "config": {
+        "label": "Phone Number",
+        "mapping": null,
+        "settings": {
+          "possible_types": [
+            "home",
+            "main",
+            "mobile",
+            "other",
+            "private_fax",
+            "work",
+            "work_fax"
+          ],
+          "call_link_scheme": "callto"
+        }
+      },
+      "external_id": "phone-number",
+      "field_id": 273434456,
+      "label": "Phone Number",
+      "type": "phone",
+      "values": [
+        {
+          "value": "3142267225",
+          "type": "other"
+        }
+      ]
+    },
+    {
+      "config": {
+        "label": "Claim Status",
+        "mapping": null,
+        "settings": {
+          "options": [
+            {
+              "id": 1,
+              "status": "active",
+              "text": "Yes",
+              "color": "DCEBD8"
+            },
+            {
+              "id": 2,
+              "status": "active",
+              "text": "No",
+              "color": "FFD1D1"
+            },
+            {
+              "id": 3,
+              "status": "active",
+              "text": "Unclaimed",
+              "color": "F3F3F3"
+            }
+          ],
+          "multiple": false,
+          "display": "inline"
+        }
+      },
+      "external_id": "claim-status",
+      "field_id": 273434457,
+      "label": "Claim Status",
+      "type": "category",
+      "values": [
+        {
+          "value": {
+            "id": 1,
+            "status": "active",
+            "text": "Yes",
+            "color": "DCEBD8"
+          }
+        }
+      ]
+    },
+    {
+      "config": {
+        "label": "Owner On Title",
+        "mapping": null,
+        "settings": {
+          "size": "large",
+          "format": "html"
+        }
+      },
+      "external_id": "owner-on-title",
+      "field_id": 273434468,
+      "label": "Owner On Title",
+      "type": "text",
+      "values": [
+        {
+          "value": "<p>John Jennemann , Carla Jennemann</p>"
+        }
+      ]
+    },
+    {
+      "config": {
+        "label": "Address",
+        "mapping": null,
+        "settings": {
+          "structured": false,
+          "has_map": true
+        }
+      },
+      "external_id": "address",
+      "field_id": 273434469,
+      "label": "Address",
+      "type": "location",
+      "values": [
+        {
+          "value": "8205 GILEAD DR, 63016 CEDAR HILL, MO, USA",
+          "lat": 38.3685183,
+          "lng": -90.63228,
+          "street_number": "8205",
+          "street_name": "Gilead Drive",
+          "postal_code": "63016",
+          "city": "Cedar Hill",
+          "state": "Missouri",
+          "country": "United States",
+          "formatted": "8205 Gilead Dr, Cedar Hill, MO 63016, USA",
+          "map_in_sync": false,
+          "street_address": "8205 Gilead Drive"
+        }
+      ]
+    },
+    {
+      "config": {
+        "label": "Setter Notes",
+        "mapping": null,
+        "settings": {
+          "size": "large",
+          "format": "html"
+        }
+      },
+      "external_id": "description",
+      "field_id": 273434470,
+      "label": "Setter Notes",
+      "type": "text",
+      "values": [
+        {
+          "value": "<p>Notes:<br/>Utility Co: Ameren<br/>Electric Bill   : $150/100 elec<br/>Marital status: Married<br/>Age   :  57 yrs old<br/>Type of roof : metal<br/> age  :   5 yrs</p>"
+        }
+      ]
+    },
+    {
+      "config": {
+        "label": "Setter Note Transfer",
+        "mapping": null,
+        "settings": {
+          "unit": null,
+          "decimals": null,
+          "time": null,
+          "calendar": null,
+          "color": null,
+          "expression": null,
+          "script": "@[Setter Notes](field_273434470)",
+          "return_type": "text"
+        }
+      },
+      "external_id": "setter-note-transfer",
+      "field_id": 273434472,
+      "label": "Setter Note Transfer",
+      "type": "calculation",
+      "values": [
+        {
+          "value": "Notes:  \nUtility Co: Ameren  \nElectric Bill : $150/100 elec  \nMarital status: Married  \nAge : 57 yrs old  \nType of roof : metal  \nage : 5 yrs"
+        }
+      ]
+    },
+    {
+      "config": {
+        "label": "Team Set By",
+        "mapping": null,
+        "settings": {
+          "size": "small",
+          "format": "plain"
+        }
+      },
+      "external_id": "set-by-3",
+      "field_id": 273434476,
+      "label": "Team Set By",
+      "type": "text",
+      "values": [
+        {
+          "value": "Team Captains"
+        }
+      ]
+    },
+    {
+      "config": {
+        "label": "Agent:",
+        "mapping": null,
+        "settings": {
+          "size": "large",
+          "format": "html"
+        }
+      },
+      "external_id": "agent",
+      "field_id": 273434477,
+      "label": "Agent:",
+      "type": "text",
+      "values": [
+        {
+          "value": "<p>Bill</p>"
+        }
+      ]
+    },
+    {
+      "config": {
+        "label": "preview of appt",
+        "mapping": null,
+        "settings": {
+          "unit": null,
+          "decimals": null,
+          "time": null,
+          "calendar": null,
+          "color": null,
+          "expression": null,
+          "script": "@[All of Preview of Appt](out_273436632_273434450) + \" \"",
+          "return_type": "text"
+        }
+      },
+      "external_id": "preview-of-appt",
+      "field_id": 273827920,
+      "label": "preview of appt",
+      "type": "calculation",
+      "values": [
+        {
+          "value": "Name- John J  \nDate- Oct 25, 2025  \nTime- 11:00AM  \nCity & State- Cedar Hill, Missouri  \nDrive time- 43m  \nNotes- Notes:  \nUtility Co: Ameren  \nElectric Bill : $150/100 elec  \nMarital status: Married  \nAge : 57 yrs old  \nType of roof : metal  \nAge : 5 yrs  \nClaim Time Window - 10  \nReply YES to claim "
+        }
+      ]
+    },
+    {
+      "config": {
+        "label": "Zap Item Id",
+        "mapping": null,
+        "settings": {
+          "unit": null,
+          "decimals": null,
+          "time": null,
+          "calendar": null,
+          "color": null,
+          "expression": null,
+          "script": "@[Item Id](item_item_id)",
+          "return_type": "text"
+        }
+      },
+      "external_id": "zap-item-id",
+      "field_id": 273434483,
+      "label": "Zap Item Id",
+      "type": "calculation",
+      "values": [
+        {
+          "value": "3188440443"
+        }
+      ]
+    },
+    {
+      "config": {
+        "label": "Calculation",
+        "mapping": null,
+        "settings": {
+          "unit": null,
+          "decimals": null,
+          "time": null,
+          "calendar": null,
+          "color": null,
+          "expression": null,
+          "script": "@[All of Item ID closer app](out_273929414_273434450) + \" \"",
+          "return_type": "text"
+        }
+      },
+      "external_id": "calculation",
+      "field_id": 273929419,
+      "label": "Calculation",
+      "type": "calculation",
+      "values": [
+        {
+          "value": "3188439897 "
+        }
+      ]
+    }
+  ],
+  "file_count": 0,
+  "item_id": 3188440443,
+  "last_event_on": "2025-10-24 21:17:15",
+  "link": "https://podio.com/eg-solar/full-org/apps/full-org/items/770",
+  "priority": 3188440443.0,
+  "ratings": {
+    "like": {
+      "average": null,
+      "counts": {
+        "1": {
+          "total": 0,
+          "users": []
+        }
+      }
+    }
+  },
+  "revision": 1,
+  "current_revision": {
+    "created_by": {
+      "avatar": -1,
+      "avatar_id": 24,
+      "avatar_type": "icon",
+      "image": null,
+      "last_seen_on": null,
+      "name": "Full Org ",
+      "id": 30430059,
+      "type": "app",
+      "url": "https://podio.com/eg-solar/full-org/apps/full-org",
+      "user_id": -1
+    },
+    "created_on": "2025-10-24 21:17:15",
+    "created_via": {
+      "auth_client_id": 9108,
+      "display": true,
+      "id": 9108,
+      "name": "Workflow automation",
+      "url": null
+    },
+    "item_revision_id": 14755932421,
+    "revision": 1,
+    "type": "update",
+    "user": {
+      "avatar": -1,
+      "avatar_id": 24,
+      "avatar_type": "icon",
+      "image": null,
+      "last_seen_on": null,
+      "name": "Full Org ",
+      "id": 30430059,
+      "type": "app",
+      "url": "https://podio.com/eg-solar/full-org/apps/full-org",
+      "user_id": -1
+    }
+  },
+  "initial_revision": {
+    "created_by": {
+      "avatar": -1,
+      "avatar_id": 24,
+      "avatar_type": "icon",
+      "image": null,
+      "last_seen_on": null,
+      "name": "Full Org ",
+      "id": 30430059,
+      "type": "app",
+      "url": "https://podio.com/eg-solar/full-org/apps/full-org",
+      "user_id": -1
+    },
+    "created_on": "2025-10-24 21:17:04",
+    "created_via": {
+      "auth_client_id": 9108,
+      "display": true,
+      "id": 9108,
+      "name": "Workflow automation",
+      "url": null
+    },
+    "item_revision_id": 14755931937,
+    "revision": 0,
+    "type": "creation",
+    "user": {
+      "avatar": -1,
+      "avatar_id": 24,
+      "avatar_type": "icon",
+      "image": null,
+      "last_seen_on": null,
+      "name": "Full Org ",
+      "id": 30430059,
+      "type": "app",
+      "url": "https://podio.com/eg-solar/full-org/apps/full-org",
+      "user_id": -1
+    }
+  },
+  "rights": [
+    "add_file",
+    "update",
+    "add_task",
+    "view",
+    "delete",
+    "subscribe",
+    "add_conversation",
+    "comment",
+    "rate"
+  ],
+  "sharefile_vault_folder_id": null,
+  "sharefile_vault_url": null,
+  "title": "John Jennemann"
+}

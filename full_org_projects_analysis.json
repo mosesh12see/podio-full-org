@@ -1,0 +1,62 @@
+{
+  "summary": {
+    "total_projects": 111,
+    "date_range": "Last 30 days (from 2025-09-22)",
+    "generated_at": "2025-10-22T17:38:40.050226"
+  },
+  "by_company": {
+    "Unknown": 105,
+    "Devonte Broadway": 1,
+    "Chad Weltlich": 3,
+    "Jacob Cole Eilers": 1,
+    "FreddieB": 1
+  },
+  "by_stage": {
+    "Setter Reset": 9,
+    "Failed Credit": 3,
+    "No Show": 6,
+    "Turned Rep Away": 10,
+    "Closed! $": 16,
+    "Yes": 11,
+    "1 Legger- SR": 6,
+    "Sales Rep FU": 28,
+    "Pending Sale": 2,
+    "No Close": 7,
+    "DQ Shade": 1,
+    "Cancelled": 6,
+    "DQ Bad Sit": 5,
+    "No": 1
+  },
+  "detailed": {
+    "Unknown": {
+      "Setter Reset": 9,
+      "Failed Credit": 3,
+      "No Show": 6,
+      "Turned Rep Away": 9,
+      "Closed! $": 15,
+      "Yes": 11,
+      "1 Legger- SR": 6,
+      "Sales Rep FU": 26,
+      "Pending Sale": 2,
+      "No Close": 5,
+      "DQ Shade": 1,
+      "Cancelled": 6,
+      "DQ Bad Sit": 5,
+      "No": 1
+    },
+    "Devonte Broadway": {
+      "Closed! $": 1
+    },
+    "Chad Weltlich": {
+      "No Close": 1,
+      "Sales Rep FU": 1,
+      "Turned Rep Away": 1
+    },
+    "Jacob Cole Eilers": {
+      "No Close": 1
+    },
+    "FreddieB": {
+      "Sales Rep FU": 1
+    }
+  }
+}

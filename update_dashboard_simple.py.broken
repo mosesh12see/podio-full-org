@@ -1,0 +1,527 @@
+#!/usr/bin/env python3
+"""
+Internal Full Org Dashboard - Simplified
+Only fetches Full Org data (no Closer App)
+"""
+
+import requests
+import json
+import re
+from datetime import datetime, timedelta
+
+# Podio credentials
+CLIENT_ID = "gpt-operator"
+CLIENT_SECRET = "yn58tFMJO0HR8JRnUgKOWKph5FEq1Fn3WgWA4NA7oS4pMSSHmAuXTpxcE6hHtwPB"
+
+# Full Org / Internal App
+FULL_ORG_APP_ID = "30430059"
+FULL_ORG_TOKEN = "daf910d595cc805cf91a4ab4edc293cb"
+
+# Closer App (for stats)
+CLOSER_APP_ID = "29175634"
+CLOSER_APP_TOKEN = "117d3fca26a11d72e48dc62e07d2e793"
+
+# Rate per sit for Internal
+RATE_PER_SIT = 350
+
+
+def get_access_token(app_id, app_token):
+    """Get Podio access token"""
+    data = {
+        'grant_type': 'app',
+        'client_id': CLIENT_ID,
+        'client_secret': CLIENT_SECRET,
+        'app_id': app_id,
+        'app_token': app_token
+    }
+
+    try:
+        response = requests.post('https://podio.com/oauth/token', data=data, timeout=30)
+        if response.status_code == 200:
+            return response.json()['access_token']
+        else:
+            print(f"❌ Auth failed: {response.status_code}")
+            return None
+    except Exception as e:
+        print(f"❌ Auth error: {e}")
+        return None
+
+
+def fetch_app_items(app_id, access_token):
+    """Fetch all items from a Podio app"""
+    all_items = []
+    offset = 0
+    limit = 100
+
+    while True:
+        headers = {
+            'Authorization': f'OAuth2 {access_token}',
+            'Content-Type': 'application/json'
+        }
+
+        body = {'limit': limit, 'offset': offset}
+
+        try:
+            response = requests.post(
+                f"https://api.podio.com/item/app/{app_id}/filter/",
+                headers=headers,
+                json=body,
+                timeout=60
+            )
+
+            if response.status_code == 200:
+                data = response.json()
+                items = data.get('items', [])
+                if not items:
+                    break
+                all_items.extend(items)
+                print(f"   Fetched {len(all_items)} items...")
+                if len(items) < limit:
+                    break
+                offset += limit
+            else:
+                print(f"   Error: {response.status_code}")
+                break
+        except Exception as e:
+            print(f"   Error: {e}")
+            break
+
+    return all_items
+
+
+def get_field_value(item, external_id):
+    """Extract field value from Podio item"""
+    for field in item.get('fields', []):
+        if field.get('external_id') == external_id:
+            values = field.get('values', [])
+            if not values:
+                return None
+
+            field_type = field.get('type')
+
+            if field_type == 'text':
+                return values[0].get('value', '')
+            elif field_type == 'number':
+                return values[0].get('value', 0)
+            elif field_type == 'category':
+                return values[0].get('value', {}).get('text', '')
+            elif field_type == 'date':
+                return values[0].get('start', '')
+            elif field_type == 'contact':
+                return values[0].get('value', {}).get('name', '')
+            elif field_type == 'app':
+                return values[0].get('value', {}).get('title', '')
+            else:
+                return str(values[0].get('value', ''))
+    return None
+
+
+def parse_date(date_str):
+    """Parse date string to datetime"""
+    if not date_str:
+        return None
+    try:
+        if 'T' in date_str:
+            return datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+        else:
+            return datetime.strptime(date_str, '%Y-%m-%d')
+    except:
+        return None
+
+
+def main():
+    print("=" * 70)
+    print("INTERNAL FULL ORG DASHBOARD (SIMPLIFIED)")
+    print("=" * 70)
+
+    # Date ranges
+    today = datetime.now().date()
+    yesterday = today - timedelta(days=1)
+    week_start = today - timedelta(days=today.weekday())
+    month_start = today.replace(day=1)
+
+    print(f"\n📅 Today: {today}")
+    print(f"   Yesterday: {yesterday}")
+    print(f"   Week Start: {week_start}")
+    print(f"   Month Start: {month_start}")
+
+    # Fetch Closer App data first (has SPS, Sit, Status, KW)
+    print("\n📊 Fetching Closer App data...")
+    closer_token = get_access_token(CLOSER_APP_ID, CLOSER_APP_TOKEN)
+    if not closer_token:
+        print("❌ Closer App authentication failed")
+        return
+
+    closer_items = fetch_app_items(CLOSER_APP_ID, closer_token)
+    print(f"   ✅ Total: {len(closer_items)} Closer App records")
+
+    # Build lookup by item_id (not customer name!)
+    closer_lookup = {}
+    for item in closer_items:
+        item_id = item.get('item_id')
+        if not item_id:
+            continue
+
+        sps = get_field_value(item, "sit-paid-status")
+        sit = get_field_value(item, "sit")
+        status = get_field_value(item, "status") or ""
+        kw = get_field_value(item, "kw-size") or 0
+        try:
+            kw = float(kw) if kw else 0
+        except:
+            kw = 0
+
+        closer_lookup[item_id] = {
+            "sps": sps,
+            "sit": sit,
+            "status": status,
+            "kw": kw
+        }
+
+    print(f"   ✅ Built lookup for {len(closer_lookup)} Closer App items")
+
+    # Fetch Full Org data
+    print("\n📊 Fetching Full Org data...")
+    token = get_access_token(FULL_ORG_APP_ID, FULL_ORG_TOKEN)
+    if not token:
+        print("❌ Authentication failed")
+        return
+
+    items = fetch_app_items(FULL_ORG_APP_ID, token)
+    print(f"   ✅ Total: {len(items)} Full Org records")
+
+    # Process items
+    all_sits = []
+    yesterday_list = []
+    wtd_list = []
+    mtd_list = []
+
+    total_unpaid = 0
+    paid_count = 0
+    paid_by_sheets = 0
+    audit_items = []
+
+    # First, let's see what fields are available AND save sample
+    if items:
+        print("\n🔍 Available fields:")
+        for field in items[0].get('fields', []):
+            print(f"   - {field.get('label')}: {field.get('external_id')} ({field.get('type')})")
+
+        # Save first item for debugging
+        with open("debug_sample_item.json", "w") as f:
+            json.dump(items[0], f, indent=2)
+        print(f"\n🐛 Saved sample item to debug_sample_item.json")
+
+    for item in items:
+        # Get customer reference (links to Closer App)
+        customer_field = None
+        for field in item.get('fields', []):
+            if field.get('external_id') == 'customer':
+                customer_field = field
+                break
+
+        if not customer_field:
+            continue
+
+        # Get customer item_id and name
+        values = customer_field.get('values', [])
+        if not values:
+            continue
+
+        customer_value = values[0].get('value', {})
+        customer_item_id = customer_value.get('item_id')
+        customer_name = customer_value.get('title', 'Unknown')
+
+        if not customer_item_id:
+            continue
+
+        # Look up Closer App data
+        closer_data = closer_lookup.get(customer_item_id, {})
+        sps = closer_data.get('sps')
+        sit = closer_data.get('sit')
+        status = closer_data.get('status', '')
+        kw = closer_data.get('kw', 0)
+
+        # Appointment date (from Full Org)
+        appt_date_str = get_field_value(item, "appointment-date")
+        appt_date = parse_date(appt_date_str)
+
+        # Get sold/closed status - HARD CODED: status contains "Closed$"
+        is_sold = "closed$" in str(status).lower()
+
+        # Payment logic (Internal Full Org rules)
+        is_paid = False
+        if sps == "P":
+            is_paid = True
+            paid_count += 1
+        elif not sps or sps == "":
+            is_paid = True
+            paid_by_sheets += 1
+        elif sps == "NP":
+            is_paid = False
+            total_unpaid += 1
+
+        # Audit check
+        is_audit = (sps == "NP" and sit != "Yes")
+        if is_audit:
+            audit_items.append({
+                "customer": customer_name,
+                "sps": sps,
+                "sit": sit or "Not set",
+                "date": appt_date_str,
+                "kw": kw,
+                "sold": is_sold
+            })
+
+        # HARD CODED LOGIC:
+        # Sit = when sit field = "Yes"
+        is_sit = (sit == "Yes")
+
+        record = {
+            "customer": customer_name,
+            "sps": sps,
+            "sit": sit,
+            "is_sit": is_sit,
+            "is_paid": is_paid,
+            "date": appt_date,
+            "date_str": appt_date_str,
+            "kw": kw,
+            "sold": is_sold,
+            "status": status,
+            "audit": is_audit
+        }
+
+        all_sits.append(record)
+
+        # Filter by date for stats
+        if appt_date:
+            appt_date_only = appt_date.date() if isinstance(appt_date, datetime) else appt_date
+
+            if appt_date_only == yesterday:
+                yesterday_list.append(record)
+            if appt_date_only >= week_start:
+                wtd_list.append(record)
+            if appt_date_only >= month_start:
+                mtd_list.append(record)
+
+    # Calculate stats from Full Org data
+    def calc_stats(lst):
+        total_assigned = len(lst)
+        sits = sum(1 for x in lst if x.get('is_sit', False))  # sit = "Yes"
+        sold = sum(1 for x in lst if x.get('sold', False))  # status contains "Closed$"
+        total_kw = round(sum(x.get('kw', 0) for x in lst), 2)
+
+        return {
+            "assigned": total_assigned,
+            "sits": sits,
+            "sold": sold,
+            "kw": total_kw,
+            "sit_ratio": round((sits / total_assigned * 100) if total_assigned > 0 else 0, 1),
+            "close_ratio": round((sold / sits * 100) if sits > 0 else 0, 1)
+        }
+
+    yesterday_stats = calc_stats(yesterday_list)
+    wtd_stats = calc_stats(wtd_list)
+    mtd_stats = calc_stats(mtd_list)
+    overall_stats = calc_stats(all_sits)
+    total_balance = total_unpaid * RATE_PER_SIT
+
+    print(f"\n💰 TOTALS:")
+    print(f"   Total Sits: {len(all_sits)}")
+    print(f"   Paid (P): {paid_count}")
+    print(f"   Paid by Sheets: {paid_by_sheets}")
+    print(f"   Unpaid (NP): {total_unpaid}")
+    print(f"   Balance Owed: ${total_balance:,}")
+    print(f"   Audit Items: {len(audit_items)}")
+
+    print(f"\n📊 YESTERDAY: Sits={yesterday_stats['sits']}, Sold={yesterday_stats['sold']}, KW={yesterday_stats['kw']}")
+    print(f"📊 WTD: Sits={wtd_stats['sits']}, Sold={wtd_stats['sold']}, KW={wtd_stats['kw']}")
+    print(f"📊 MTD: Sits={mtd_stats['sits']}, Sold={mtd_stats['sold']}, KW={mtd_stats['kw']}")
+
+    # Generate HTML
+    data = {
+        "last_updated": datetime.now().strftime("%Y-%m-%d %I:%M %p"),
+        "today": str(today),
+        "yesterday": str(yesterday),
+        "week_start": str(week_start),
+        "month_start": str(month_start),
+        "total_balance": total_balance,
+        "total_sits": len(all_sits),
+        "paid_count": paid_count,
+        "paid_by_sheets": paid_by_sheets,
+        "unpaid_count": total_unpaid,
+        "audit_count": len(audit_items),
+        "yesterday_stats": yesterday_stats,
+        "wtd_stats": wtd_stats,
+        "mtd_stats": mtd_stats,
+        "audit_items": audit_items
+    }
+
+    # Try to update existing HTML, or create new
+    html_file = "internal_full_org_dashboard.html"
+    try:
+        with open(html_file, "r") as f:
+            html = f.read()
+        # Update data
+        html = re.sub(
+            r'const DASHBOARD_DATA = \{.*?\};',
+            f'const DASHBOARD_DATA = {json.dumps(data)};',
+            html,
+            flags=re.DOTALL
+        )
+        with open(html_file, "w") as f:
+            f.write(html)
+        print(f"\n✅ Updated: {html_file}")
+    except:
+        # Create new
+        create_html(data, html_file)
+        print(f"\n✅ Created: {html_file}")
+
+    print("=" * 70)
+
+
+def create_html(data, filename):
+    """Create HTML dashboard"""
+    html = f"""<!DOCTYPE html>
+<html>
+<head>
+    <title>Internal Full Org Dashboard</title>
+    <meta charset="UTF-8">
+    <style>
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }}
+        .container {{ max-width: 1600px; margin: 0 auto; }}
+        .header {{ text-align: center; color: white; margin-bottom: 30px; }}
+        .header h1 {{ font-size: 3em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }}
+        .balance-banner {{ background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 50px; border-radius: 20px; margin-bottom: 40px; color: white; text-align: center; box-shadow: 0 15px 50px rgba(0,0,0,0.4); }}
+        .balance-banner h2 {{ font-size: 1.5em; opacity: 0.9; margin-bottom: 15px; }}
+        .balance-banner .amount {{ font-size: 5em; font-weight: bold; text-shadow: 3px 3px 6px rgba(0,0,0,0.3); }}
+        .balance-banner .subtitle {{ font-size: 1.2em; opacity: 0.9; margin-top: 15px; }}
+        .stats-grid {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-bottom: 40px; }}
+        .stat-card {{ background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }}
+        .stat-card h2 {{ color: #667eea; font-size: 1.8em; margin-bottom: 25px; border-bottom: 3px solid #667eea; padding-bottom: 15px; }}
+        .stat-row {{ display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #f0f0f0; }}
+        .stat-row:last-child {{ border-bottom: none; }}
+        .stat-label {{ color: #666; font-weight: 600; font-size: 1.1em; }}
+        .stat-value {{ font-weight: bold; color: #2c3e50; font-size: 1.3em; }}
+        .stat-value.highlight {{ color: #e74c3c; font-size: 1.5em; }}
+        .totals-section {{ background: white; border-radius: 20px; padding: 30px; margin-bottom: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }}
+        .totals-section h2 {{ color: #667eea; font-size: 1.8em; margin-bottom: 25px; }}
+        .totals-grid {{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }}
+        .total-box {{ background: #f8f9fa; padding: 20px; border-radius: 15px; text-align: center; }}
+        .total-box .label {{ color: #666; margin-bottom: 10px; }}
+        .total-box .value {{ font-size: 2em; font-weight: bold; color: #2c3e50; }}
+        .audit-section {{ background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }}
+        .audit-section h2 {{ color: #e74c3c; font-size: 1.8em; margin-bottom: 20px; }}
+        .audit-item {{ background: #fff5f5; padding: 15px; margin: 10px 0; border-radius: 10px; border-left: 4px solid #e74c3c; }}
+        .footer {{ text-align: center; color: white; margin-top: 30px; opacity: 0.8; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Internal Full Org Dashboard</h1>
+            <p>Real-time stats from Podio</p>
+        </div>
+
+        <div class="balance-banner">
+            <h2>Total Balance Owed</h2>
+            <div class="amount" id="total-balance">$0</div>
+            <div class="subtitle"><span id="unpaid-count">0</span> Unpaid Sits × $350</div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h2>Yesterday</h2>
+                <div class="stat-row"><span class="stat-label">Sits</span><span class="stat-value" id="yesterday-sits">0</span></div>
+                <div class="stat-row"><span class="stat-label">Sold</span><span class="stat-value highlight" id="yesterday-sold">0</span></div>
+                <div class="stat-row"><span class="stat-label">KW</span><span class="stat-value" id="yesterday-kw">0</span></div>
+            </div>
+
+            <div class="stat-card">
+                <h2>WTD</h2>
+                <div class="stat-row"><span class="stat-label">Sits</span><span class="stat-value" id="wtd-sits">0</span></div>
+                <div class="stat-row"><span class="stat-label">Sold</span><span class="stat-value highlight" id="wtd-sold">0</span></div>
+                <div class="stat-row"><span class="stat-label">KW</span><span class="stat-value" id="wtd-kw">0</span></div>
+            </div>
+
+            <div class="stat-card">
+                <h2>MTD</h2>
+                <div class="stat-row"><span class="stat-label">Sits</span><span class="stat-value" id="mtd-sits">0</span></div>
+                <div class="stat-row"><span class="stat-label">Sold</span><span class="stat-value highlight" id="mtd-sold">0</span></div>
+                <div class="stat-row"><span class="stat-label">KW</span><span class="stat-value" id="mtd-kw">0</span></div>
+            </div>
+        </div>
+
+        <div class="totals-section">
+            <h2>Overall Totals</h2>
+            <div class="totals-grid">
+                <div class="total-box"><div class="label">Total Sits</div><div class="value" id="total-sits">0</div></div>
+                <div class="total-box"><div class="label">Paid (P)</div><div class="value" id="paid-count">0</div></div>
+                <div class="total-box"><div class="label">Paid by Sheets</div><div class="value" id="paid-sheets">0</div></div>
+                <div class="total-box"><div class="label">Unpaid (NP)</div><div class="value" id="unpaid-total">0</div></div>
+            </div>
+        </div>
+
+        <div class="audit-section">
+            <h2>⚠️ Audit: Sit Dispo Changed (<span id="audit-count">0</span>)</h2>
+            <p style="color:#666;margin-bottom:20px;">SPS=NP AND Sit≠Yes</p>
+            <div id="audit-list"></div>
+        </div>
+
+        <div class="footer">
+            <p>Updated: <span id="last-updated">--</span></p>
+            <p>Yesterday: <span id="yesterday-date">--</span> | Week: <span id="week-start">--</span> | Month: <span id="month-start">--</span></p>
+        </div>
+    </div>
+
+    <script>
+    const DASHBOARD_DATA = {json.dumps(data)};
+
+    function fmt(n) {{ return '$' + n.toLocaleString(); }}
+
+    function load() {{
+        document.getElementById('total-balance').textContent = fmt(DASHBOARD_DATA.total_balance);
+        document.getElementById('unpaid-count').textContent = DASHBOARD_DATA.unpaid_count;
+
+        document.getElementById('yesterday-sits').textContent = DASHBOARD_DATA.yesterday_stats.sits;
+        document.getElementById('yesterday-sold').textContent = DASHBOARD_DATA.yesterday_stats.sold;
+        document.getElementById('yesterday-kw').textContent = DASHBOARD_DATA.yesterday_stats.kw;
+
+        document.getElementById('wtd-sits').textContent = DASHBOARD_DATA.wtd_stats.sits;
+        document.getElementById('wtd-sold').textContent = DASHBOARD_DATA.wtd_stats.sold;
+        document.getElementById('wtd-kw').textContent = DASHBOARD_DATA.wtd_stats.kw;
+
+        document.getElementById('mtd-sits').textContent = DASHBOARD_DATA.mtd_stats.sits;
+        document.getElementById('mtd-sold').textContent = DASHBOARD_DATA.mtd_stats.sold;
+        document.getElementById('mtd-kw').textContent = DASHBOARD_DATA.mtd_stats.kw;
+
+        document.getElementById('total-sits').textContent = DASHBOARD_DATA.total_sits;
+        document.getElementById('paid-count').textContent = DASHBOARD_DATA.paid_count;
+        document.getElementById('paid-sheets').textContent = DASHBOARD_DATA.paid_by_sheets;
+        document.getElementById('unpaid-total').textContent = DASHBOARD_DATA.unpaid_count;
+
+        document.getElementById('audit-count').textContent = DASHBOARD_DATA.audit_count;
+        let html = '';
+        DASHBOARD_DATA.audit_items.forEach(i => {{
+            html += `<div class="audit-item"><strong>${{i.customer}}</strong> - SPS: ${{i.sps}} | Sit: ${{i.sit}} | Date: ${{i.date}} | KW: ${{i.kw}} | Sold: ${{i.sold ? 'Yes' : 'No'}}</div>`;
+        }});
+        document.getElementById('audit-list').innerHTML = html || '<p style="color:#666;">None</p>';
+
+        document.getElementById('last-updated').textContent = DASHBOARD_DATA.last_updated;
+        document.getElementById('yesterday-date').textContent = DASHBOARD_DATA.yesterday;
+        document.getElementById('week-start').textContent = DASHBOARD_DATA.week_start;
+        document.getElementById('month-start').textContent = DASHBOARD_DATA.month_start;
+    }}
+
+    load();
+    </script>
+</body>
+</html>
+"""
+    with open(filename, "w") as f:
+        f.write(html)
+
+
+if __name__ == "__main__":
+    main()

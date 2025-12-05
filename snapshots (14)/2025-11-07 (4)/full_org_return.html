@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Org Return - Complete Performance Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+            min-height: 100vh;
+            padding: 30px;
+            color: #fff;
+            zoom: 0.65;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(251, 191, 36, 0.5);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .last-updated {
+            text-align: center;
+            opacity: 0.7;
+            margin-bottom: 30px;
+            font-size: 1em;
+        }
+
+        /* Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .summary-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .summary-card h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(251, 191, 36, 0.5);
+            padding-bottom: 10px;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .metric {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #fbbf24;
+        }
+
+        .metric-value.success {
+            color: #4ade80;
+        }
+
+        .metric-value.info {
+            color: #60a5fa;
+        }
+
+        /* Daily Averages Section */
+        .daily-avg-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .daily-avg-section h2 {
+            font-size: 2em;
+            margin-bottom: 25px;
+            text-align: center;
+            color: #fbbf24;
+        }
+
+        .daily-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .daily-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .daily-box .label {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+
+        .daily-box .value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #4ade80;
+        }
+
+        /* Monthly Breakdown Table */
+        .monthly-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 40px;
+        }
+
+        .monthly-section h2 {
+            font-size: 2em;
+            margin-bottom: 25px;
+            text-align: center;
+            color: #fbbf24;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th {
+            background: rgba(251, 191, 36, 0.2);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(251, 191, 36, 0.5);
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            opacity: 0.6;
+            font-size: 0.95em;
+        }
+
+        .footer p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 FULL ORG RETURN</h1>
+            <p>Comprehensive Performance Dashboard - Real Podio Data</p>
+        </div>
+
+        <div class="last-updated">
+            Last Updated: November 07, 2025 at 06:11 PM<br>
+            <span style="font-size: 0.9em; opacity: 0.8;">Cron Job Update - Auto-refreshes 5x daily (9am, 12pm, 3pm, 6pm, 9pm)</span>
+        </div>
+
+        <!-- Summary Cards: YTD 2025, Since Start, MTD -->
+        <div class="summary-grid">
+            <!-- YTD 2025 Card -->
+            <div class="summary-card">
+                <h2>📆 YTD 2025 (Year to Date)</h2>
+                <p style="opacity: 0.7; margin-bottom: 15px; font-size: 0.9em;">Jan 1, 2025 to 2025-11-07</p>
+                <div class="metric-grid">
+                    <div class="metric">
+                        <div class="metric-label">Total Appointments</div>
+                        <div class="metric-value info">596</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Sits</div>
+                        <div class="metric-value info">367</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Sit Rate</div>
+                        <div class="metric-value success">61.6%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Closed Deals</div>
+                        <div class="metric-value success">90</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Close Rate</div>
+                        <div class="metric-value success">24.5%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">KW Closed</div>
+                        <div class="metric-value">855.75</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Revenue</div>
+                        <div class="metric-value">$4,706,652</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Net Profit ($0.57/watt)</div>
+                        <div class="metric-value">$487,780</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Net Profit ($3212/deal)</div>
+                        <div class="metric-value">$289,080</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Since Start Card -->
+            <div class="summary-card">
+                <h2>📈 Since Start (All Time)</h2>
+                <p style="opacity: 0.7; margin-bottom: 15px; font-size: 0.9em;">Since 2025-08-09</p>
+                <div class="metric-grid">
+                    <div class="metric">
+                        <div class="metric-label">Total Appointments</div>
+                        <div class="metric-value info">587</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Sits</div>
+                        <div class="metric-value info">358</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Sit Rate</div>
+                        <div class="metric-value success">61.0%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Closed Deals</div>
+                        <div class="metric-value success">89</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Close Rate</div>
+                        <div class="metric-value success">24.9%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">KW Closed</div>
+                        <div class="metric-value">855.75</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Revenue</div>
+                        <div class="metric-value">$4,706,652</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Net Profit ($0.57/watt)</div>
+                        <div class="metric-value">$487,780</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Net Profit ($3212/deal)</div>
+                        <div class="metric-value">$285,868</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MTD Card -->
+            <div class="summary-card">
+                <h2>📅 MTD (Month to Date)</h2>
+                <p style="opacity: 0.7; margin-bottom: 15px; font-size: 0.9em;">2025-11-01 to 2025-11-07</p>
+                <div class="metric-grid">
+                    <div class="metric">
+                        <div class="metric-label">Total Appointments</div>
+                        <div class="metric-value info">47</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Sits</div>
+                        <div class="metric-value info">18</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Sit Rate</div>
+                        <div class="metric-value success">38.3%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Closed Deals</div>
+                        <div class="metric-value success">3</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Close Rate</div>
+                        <div class="metric-value success">16.7%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">KW Closed</div>
+                        <div class="metric-value">36.85</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Revenue</div>
+                        <div class="metric-value">$202,675</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Net Profit ($0.57/watt)</div>
+                        <div class="metric-value">$21,004</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Net Profit ($3212/deal)</div>
+                        <div class="metric-value">$9,636</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Card -->
+            <div class="summary-card">
+                <h2>ℹ️ Dashboard Info</h2>
+                <p style="opacity: 0.8; margin-bottom: 15px;">Real-time data from Podio for the Full Organization</p>
+
+                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <p style="font-weight: bold; margin-bottom: 8px;">Time Periods:</p>
+                    <p style="font-size: 0.9em; margin: 5px 0;">
+                        <strong style="color: #60a5fa;">YTD 2025:</strong> Jan 1, 2025 to today
+                    </p>
+                    <p style="font-size: 0.9em; margin: 5px 0;">
+                        <strong style="color: #fbbf24;">Since Start:</strong> 2025-08-09 to today<br>
+                        <span style="opacity: 0.7; font-size: 0.85em;">(First day with 3+ assigned appts)</span>
+                    </p>
+                    <p style="font-size: 0.9em; margin: 5px 0;">
+                        <strong style="color: #4ade80;">MTD:</strong> This month only
+                    </p>
+                </div>
+
+                <p style="opacity: 0.7; font-size: 0.9em;">
+                    <strong>Calculations:</strong><br>
+                    • Revenue: KW × 1000 × $5.50<br>
+                    • Net Profit (watt): KW × 1000 × $0.57<br>
+                    • Net Profit (deal): Closed × $3,212<br>
+                    • Sit Rate: Sits ÷ Appointments<br>
+                    • Close Rate: Closed ÷ Sits
+                </p>
+            </div>
+        </div>
+
+        <!-- Daily Averages -->
+        <div class="daily-avg-section">
+            <h2>📈 Daily Averages (Since YTD Start)</h2>
+            <div class="daily-grid">
+                <div class="daily-box">
+                    <div class="label">Avg Appointments per Day</div>
+                    <div class="value">6.45</div>
+                </div>
+                <div class="daily-box">
+                    <div class="label">Avg Sits per Day</div>
+                    <div class="value">3.93</div>
+                </div>
+                <div class="daily-box">
+                    <div class="label">Avg Closed per Day</div>
+                    <div class="value">0.98</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Breakdown Table -->
+        <div class="monthly-section">
+            <h2>📊 Per-Month Breakdown</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Appointments</th>
+                        <th>Sits</th>
+                        <th>Sit Rate</th>
+                        <th>Closed</th>
+                        <th>Close Rate</th>
+                        <th>KW</th>
+                        <th>Revenue</th>
+                        <th>Net Profit ($0.57/watt)</th>
+                        <th>Net Profit ($3212/deal)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+        <tr>
+            <td>November 2025</td>
+            <td>47</td>
+            <td>18</td>
+            <td>38.3%</td>
+            <td>3</td>
+            <td>16.7%</td>
+            <td>36.85</td>
+            <td>$202,675</td>
+            <td>$21,004</td>
+            <td>$9,636</td>
+        </tr>
+        
+        <tr>
+            <td>October 2025</td>
+            <td>132</td>
+            <td>77</td>
+            <td>58.3%</td>
+            <td>20</td>
+            <td>26.0%</td>
+            <td>129.88</td>
+            <td>$714,340</td>
+            <td>$74,032</td>
+            <td>$64,240</td>
+        </tr>
+        
+        <tr>
+            <td>September 2025</td>
+            <td>129</td>
+            <td>84</td>
+            <td>65.1%</td>
+            <td>18</td>
+            <td>21.4%</td>
+            <td>223.47</td>
+            <td>$1,229,058</td>
+            <td>$127,375</td>
+            <td>$57,816</td>
+        </tr>
+        
+        <tr>
+            <td>August 2025</td>
+            <td>279</td>
+            <td>179</td>
+            <td>64.2%</td>
+            <td>48</td>
+            <td>26.8%</td>
+            <td>465.56</td>
+            <td>$2,560,580</td>
+            <td>$265,369</td>
+            <td>$154,176</td>
+        </tr>
+        
+                </tbody>
+            </table>
+        </div>
+
+        <!-- COST ANALYSIS SECTIONS -->
+        <div style="margin-top: 60px; border-top: 3px solid rgba(255, 255, 255, 0.3); padding-top: 40px;">
+            <h2 style="text-align: center; font-size: 2.5em; margin-bottom: 40px; color: #fbbf24;">
+                💰 COST ANALYSIS (EXTRA)
+            </h2>
+
+            <!-- At Cost Analysis ($350/sit) -->
+            <div class="monthly-section" style="margin-bottom: 40px;">
+                <h2 style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    💵 At Cost to Generate Revenue ($350 per sit)
+                </h2>
+
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-bottom: 30px;">
+                    <!-- YTD 2025 At Cost -->
+                    <div style="background: rgba(16, 185, 129, 0.1); padding: 25px; border-radius: 15px; border: 2px solid rgba(16, 185, 129, 0.3);">
+                        <h3 style="font-size: 1.5em; margin-bottom: 20px; color: #10b981;">YTD 2025</h3>
+                        <div style="display: grid; gap: 15px;">
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="opacity: 0.8;">Total Sits:</span>
+                                <span style="font-weight: bold; font-size: 1.2em;">367</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="opacity: 0.8;">Cost ($350/sit):</span>
+                                <span style="font-weight: bold; font-size: 1.2em; color: #f87171;">$128,450</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="opacity: 0.8;">Revenue ($5.5/watt):</span>
+                                <span style="font-weight: bold; font-size: 1.2em; color: #60a5fa;">$4,706,652</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 15px 0; background: rgba(16, 185, 129, 0.2); margin: 10px -15px -15px; padding: 20px;">
+                                <span style="font-size: 1.1em; font-weight: 600;">NET PROFIT:</span>
+                                <span style="font-weight: bold; font-size: 1.5em; color: #10b981;">$4,578,202</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Since Start At Cost -->
+                    <div style="background: rgba(16, 185, 129, 0.1); padding: 25px; border-radius: 15px; border: 2px solid rgba(16, 185, 129, 0.3);">
+                        <h3 style="font-size: 1.5em; margin-bottom: 20px; color: #10b981;">Since Start</h3>
+                        <div style="display: grid; gap: 15px;">
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="opacity: 0.8;">Total Sits:</span>
+                                <span style="font-weight: bold; font-size: 1.2em;">358</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="opacity: 0.8;">Cost ($350/sit):</span>
+                                <span style="font-weight: bold; font-size: 1.2em; color: #f87171;">$125,300</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="opacity: 0.8;">Revenue ($5.5/watt):</span>
+                                <span style="font-weight: bold; font-size: 1.2em; color: #60a5fa;">$4,706,652</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 15px 0; background: rgba(16, 185, 129, 0.2); margin: 10px -15px -15px; padding: 20px;">
+                                <span style="font-size: 1.1em; font-weight: 600;">NET PROFIT:</span>
+                                <span style="font-weight: bold; font-size: 1.5em; color: #10b981;">$4,581,352</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MTD At Cost -->
+                    <div style="background: rgba(16, 185, 129, 0.1); padding: 25px; border-radius: 15px; border: 2px solid rgba(16, 185, 129, 0.3);">
+                        <h3 style="font-size: 1.5em; margin-bottom: 20px; color: #10b981;">MTD</h3>
+                        <div style="display: grid; gap: 15px;">
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="opacity: 0.8;">Total Sits:</span>
+                                <span style="font-weight: bold; font-size: 1.2em;">18</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="opacity: 0.8;">Cost ($350/sit):</span>
+                                <span style="font-weight: bold; font-size: 1.2em; color: #f87171;">$6,300</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="opacity: 0.8;">Revenue ($5.5/watt):</span>
+                                <span style="font-weight: bold; font-size: 1.2em; color: #60a5fa;">$202,675</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 15px 0; background: rgba(16, 185, 129, 0.2); margin: 10px -15px -15px; padding: 20px;">
+                                <span style="font-size: 1.1em; font-weight: 600;">NET PROFIT:</span>
+                                <span style="font-weight: bold; font-size: 1.5em; color: #10b981;">$196,375</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monthly Breakdown for At Cost -->
+                <h3 style="font-size: 1.5em; margin: 30px 0 20px; text-align: center;">Per-Month Breakdown ($350/sit)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Sits</th>
+                            <th>Cost ($350)</th>
+                            <th>Revenue</th>
+                            <th>Net Profit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+        <tr>
+            <td>November 2025</td>
+            <td>18</td>
+            <td>$6,300</td>
+            <td>$202,675</td>
+            <td style="color: #10b981; font-weight: bold;">$196,375</td>
+        </tr>
+        
+        <tr>
+            <td>October 2025</td>
+            <td>77</td>
+            <td>$26,950</td>
+            <td>$714,340</td>
+            <td style="color: #10b981; font-weight: bold;">$687,390</td>
+        </tr>
+        
+        <tr>
+            <td>September 2025</td>
+            <td>84</td>
+            <td>$29,400</td>
+            <td>$1,229,058</td>
+            <td style="color: #10b981; font-weight: bold;">$1,199,658</td>
+        </tr>
+        
+        <tr>
+            <td>August 2025</td>
+            <td>179</td>
+            <td>$62,650</td>
+            <td>$2,560,580</td>
+            <td style="color: #10b981; font-weight: bold;">$2,497,930</td>
+        </tr>
+        
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Premium Cost Analysis ($550/sit) -->
+            <div class="monthly-section">
+                <h2 style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    ⭐ Premium Cost ($550 per sit)
+                </h2>
+
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-bottom: 30px;">
+                    <!-- YTD 2025 Premium -->
+                    <div style="background: rgba(139, 92, 246, 0.1); padding: 25px; border-radius: 15px; border: 2px solid rgba(139, 92, 246, 0.3);">
+                        <h3 style="font-size: 1.5em; margin-bottom: 20px; color: #8b5cf6;">YTD 2025</h3>
+                        <div style="display: grid; gap: 15px;">
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="opacity: 0.8;">Total Sits:</span>
+                                <span style="font-weight: bold; font-size: 1.2em;">367</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="opacity: 0.8;">Cost ($550/sit):</span>
+                                <span style="font-weight: bold; font-size: 1.2em; color: #f87171;">$201,850</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="opacity: 0.8;">Revenue ($5.5/watt):</span>
+                                <span style="font-weight: bold; font-size: 1.2em; color: #60a5fa;">$4,706,652</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 15px 0; background: rgba(139, 92, 246, 0.2); margin: 10px -15px -15px; padding: 20px;">
+                                <span style="font-size: 1.1em; font-weight: 600;">NET PROFIT:</span>
+                                <span style="font-weight: bold; font-size: 1.5em; color: #8b5cf6;">$4,504,802</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Since Start Premium -->
+                    <div style="background: rgba(139, 92, 246, 0.1); padding: 25px; border-radius: 15px; border: 2px solid rgba(139, 92, 246, 0.3);">
+                        <h3 style="font-size: 1.5em; margin-bottom: 20px; color: #8b5cf6;">Since Start</h3>
+                        <div style="display: grid; gap: 15px;">
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="opacity: 0.8;">Total Sits:</span>
+                                <span style="font-weight: bold; font-size: 1.2em;">358</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="opacity: 0.8;">Cost ($550/sit):</span>
+                                <span style="font-weight: bold; font-size: 1.2em; color: #f87171;">$196,900</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="opacity: 0.8;">Revenue ($5.5/watt):</span>
+                                <span style="font-weight: bold; font-size: 1.2em; color: #60a5fa;">$4,706,652</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 15px 0; background: rgba(139, 92, 246, 0.2); margin: 10px -15px -15px; padding: 20px;">
+                                <span style="font-size: 1.1em; font-weight: 600;">NET PROFIT:</span>
+                                <span style="font-weight: bold; font-size: 1.5em; color: #8b5cf6;">$4,509,752</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MTD Premium -->
+                    <div style="background: rgba(139, 92, 246, 0.1); padding: 25px; border-radius: 15px; border: 2px solid rgba(139, 92, 246, 0.3);">
+                        <h3 style="font-size: 1.5em; margin-bottom: 20px; color: #8b5cf6;">MTD</h3>
+                        <div style="display: grid; gap: 15px;">
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="opacity: 0.8;">Total Sits:</span>
+                                <span style="font-weight: bold; font-size: 1.2em;">18</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="opacity: 0.8;">Cost ($550/sit):</span>
+                                <span style="font-weight: bold; font-size: 1.2em; color: #f87171;">$9,900</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="opacity: 0.8;">Revenue ($5.5/watt):</span>
+                                <span style="font-weight: bold; font-size: 1.2em; color: #60a5fa;">$202,675</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 15px 0; background: rgba(139, 92, 246, 0.2); margin: 10px -15px -15px; padding: 20px;">
+                                <span style="font-size: 1.1em; font-weight: 600;">NET PROFIT:</span>
+                                <span style="font-weight: bold; font-size: 1.5em; color: #8b5cf6;">$192,775</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monthly Breakdown for Premium -->
+                <h3 style="font-size: 1.5em; margin: 30px 0 20px; text-align: center;">Per-Month Breakdown ($550/sit)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Sits</th>
+                            <th>Cost ($550)</th>
+                            <th>Revenue</th>
+                            <th>Net Profit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+        <tr>
+            <td>November 2025</td>
+            <td>18</td>
+            <td>$9,900</td>
+            <td>$202,675</td>
+            <td style="color: #8b5cf6; font-weight: bold;">$192,775</td>
+        </tr>
+        
+        <tr>
+            <td>October 2025</td>
+            <td>77</td>
+            <td>$42,350</td>
+            <td>$714,340</td>
+            <td style="color: #8b5cf6; font-weight: bold;">$671,990</td>
+        </tr>
+        
+        <tr>
+            <td>September 2025</td>
+            <td>84</td>
+            <td>$46,200</td>
+            <td>$1,229,058</td>
+            <td style="color: #8b5cf6; font-weight: bold;">$1,182,858</td>
+        </tr>
+        
+        <tr>
+            <td>August 2025</td>
+            <td>179</td>
+            <td>$98,450</td>
+            <td>$2,560,580</td>
+            <td style="color: #8b5cf6; font-weight: bold;">$2,462,130</td>
+        </tr>
+        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Full Organization Return Dashboard</strong> | Podio Closer App Data</p>
+            <p>YTD 2025: 2025-01-01 to 2025-11-07 | Since Start: 2025-08-09 to 2025-11-07 | MTD: 2025-11-01 to 2025-11-07</p>
+            <p style="margin-top: 10px;">
+                💰 Revenue Rate: $5.50/watt | 💵 Net Profit: $0.57/watt or $3,212/deal
+            </p>
+            <p style="margin-top: 10px; opacity: 0.7;">
+                Cost Analysis: At Cost ($350/sit) | Premium ($550/sit)
+            </p>
+        </div>
+    </div>
+</body>
+</html>
